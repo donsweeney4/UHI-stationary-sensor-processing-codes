@@ -1,1 +1,1 @@
-web: gunicorn bsJunk2
+web: gunicorn bsjunk2
