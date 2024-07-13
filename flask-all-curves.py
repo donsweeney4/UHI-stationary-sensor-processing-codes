@@ -6,6 +6,25 @@ import requests
 import csv
 import io
 import gunicorn
+import mysql.connector
+from mysql.connector import Error
+
+###########################################################################
+# Function to connect to MySQL database
+def connect_to_database():
+    try:
+        connection = mysql.connector.connect(
+            host='localhost',
+            database='uhi',
+            user='uhi',
+            password='uhi'
+        )
+        if connection.is_connected():
+            print("Connected to MySQL database")
+        return connection
+    except Error as e:
+        print(f"Error connecting to MySQL: {e}")
+        return None
 
 ###########################################################################
 def generate_timestamps(start_date, end_date):
@@ -19,7 +38,7 @@ def fetch_airport_weather_data(start_date, end_date):
     # Replace 'YOUR_TRIAL_API_KEY' with your actual trial API key
     API_KEY = 'f4b2bc4e96f14522bd502646240507'
     LOCATION = 'Livermore, CA'
-    NUM_DAYS = 7
+    NUM_DAYS = 10
 
     # Generate the date strings for the past 1 day
     end_date = datetime.now()
@@ -37,10 +56,6 @@ def fetch_airport_weather_data(start_date, end_date):
     airportData = response.json()   
     return airportData
 
-
-
-
-# fetch_llnl_weather_data and other data fetching functions are defined elsewhere
 ###########################################################################
 def fetch_llnl_weather_data(start_date, end_date):
     formatted_start_date = start_date.strftime('%Y-%m-%d')
@@ -108,11 +123,12 @@ def plot():
     LLNLdates = [datetime.strptime(entry['date'], '%Y-%m-%d %H:%M:%S') for entry in LLNLdata]
     LLNLtemperatures = [entry['temperature'] for entry in LLNLdata]
 
-# Fetch the sensorPush data
+# Fetch the SensorPush data
 ###########################################################################
-    # Define the file paths
-    file1 = './data/Sensor10.csv'
-    file2 = './data/Sensor2.csv'
+
+
+
+
 
     # Specify column names manually for CSV files
     column_names = ['Timestamp', 'Temperature (A°C)', 'Relative Humidity (%)']
@@ -120,6 +136,11 @@ def plot():
     # Read the data from the CSV files
     df1 = pd.read_csv(file1, skiprows=1, header=None, names=column_names, parse_dates=['Timestamp'], index_col='Timestamp')
     df2 = pd.read_csv(file2, skiprows=1, header=None, names=column_names, parse_dates=['Timestamp'], index_col='Timestamp')
+
+
+
+
+
 
 # Fetch the Quest weather station data
 ###########################################################################
@@ -187,4 +208,4 @@ def plot():
 
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(debug=True,host='0.0.0.0')
